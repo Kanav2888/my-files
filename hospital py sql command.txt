@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS hospital;
+
+USE hospital;
+
+CREATE TABLE IF NOT EXISTS patients (
+    name VARCHAR(50),
+    age INT,
+    gender VARCHAR(10),
+    disease VARCHAR(100)
+);
