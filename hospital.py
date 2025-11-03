@@ -1,81 +1,85 @@
 import mysql.connector
-from tabulate import tabulate   # optional pretty printing (install once: python -m pip install tabulate)
+import random
 
 # Connect to MySQL
 con = mysql.connector.connect(
     host="localhost",
-    user="csproject",
-    password="cs123",
+    user="root",
+    password="Admin@123",
     database="hospital"
 )
-
-cursor = con.cursor()
+cur = con.cursor()
 
 def add_patient():
-    """Insert a new patient into the table"""
-    name = input("Enter patient name: ")
-    age = int(input("Enter age: "))
-    gender = input("Enter gender: ")
-    disease = input("Enter disease: ")
+    pid = random.randint(10000, 99999)
+    name = input("Enter Patient Name: ")
+    age = int(input("Enter Age: "))
+    disease = input("Enter Disease: ")
 
-    sql = "INSERT INTO patients (name, age, gender, disease) VALUES (%s,%s,%s,%s)"
-    cursor.execute(sql, (name, age, gender, disease))
+    cur.execute("INSERT INTO patient (pid, name, age, disease) VALUES (%s, %s, %s, %s)",
+                (pid, name, age, disease))
     con.commit()
-    print("Patient record added.\n")
+    print(f"Patient Added Successfully! (Patient ID: {pid})\n")
 
-def view_patients():
-    """Fetch and display all patients"""
-    cursor.execute("SELECT * FROM patients")
-    rows = cursor.fetchall()
-    if rows:
-        print(tabulate(rows, headers=["Name", "Age", "Gender", "Disease"], tablefmt="grid"))
-    else:
-        print("No patient records found.\n")
+def display_all():
+    cur.execute("SELECT * FROM patient")
+    result = cur.fetchall()
+
+    print("\nPatient Records:")
+    print(f"{'ID':<8}{'Name':<20}{'Age':<8}{'Disease':<15}")
+    print("-" * 55)
+
+    for row in result:
+        print(f"{row[0]:<8}{row[1]:<20}{row[2]:<8}{row[3]:<15}")
+    print()
 
 def search_patient():
-    """Search for patient by name"""
-    name = input("Enter patient name to search: ")
-    sql = "SELECT * FROM patients WHERE name=%s"
-    cursor.execute(sql, (name,))
-    rows = cursor.fetchall()
-    if rows:
-        print(tabulate(rows, headers=["Name", "Age", "Gender", "Disease"], tablefmt="grid"))
+    pid = int(input("Enter Patient ID to Search: "))
+    cur.execute("SELECT * FROM patient WHERE pid=%s", (pid,))
+    result = cur.fetchone()
+    if result:
+        print("\nPatient Found:")
+        print(f"ID: {result[0]}\nName: {result[1]}\nAge: {result[2]}\nDisease: {result[3]}\n")
     else:
-        print("No record found.\n")
+        print("No Record Found.\n")
+
+def update_patient():
+    pid = int(input("Enter Patient ID to Update: "))
+    disease = input("Enter New Disease: ")
+    cur.execute("UPDATE patient SET disease=%s WHERE pid=%s", (disease, pid))
+    con.commit()
+    print("Record Updated!\n")
 
 def delete_patient():
-    """Delete patient by name"""
-    name = input("Enter patient name to delete: ")
-    sql = "DELETE FROM patients WHERE name=%s"
-    cursor.execute(sql, (name,))
+    pid = int(input("Enter Patient ID to Delete: "))
+    cur.execute("DELETE FROM patient WHERE pid=%s", (pid,))
     con.commit()
-    print("Patient record deleted (if it existed).\n")
+    print("Record Deleted!\n")
 
-def menu():
-    while True:
-        print("\n=== Hospital Management System ===")
-        print("1. Add Patient")
-        print("2. View All Patients")
-        print("3. Search Patient")
-        print("4. Delete Patient")
-        print("5. Exit")
-        choice = input("Enter choice: ")
+while True:
+    print('''
+===== HOSPITAL MANAGEMENT SYSTEM =====
+1. Add New Patient
+2. Display All Patients
+3. Search Patient
+4. Update Patient
+5. Delete Patient
+6. Exit
+''')
+    choice = input("Enter your choice: ")
 
-        if choice == '1':
-            add_patient()
-        elif choice == '2':
-            view_patients()
-        elif choice == '3':
-            search_patient()
-        elif choice == '4':
-            delete_patient()
-        elif choice == '5':
-            print("Exiting...")
-            break
-        else:
-            print("Invalid choice.\n")
-
-menu()
-
-cursor.close()
-con.close()
+    if choice == '1':
+        add_patient()
+    elif choice == '2':
+        display_all()
+    elif choice == '3':
+        search_patient()
+    elif choice == '4':
+        update_patient()
+    elif choice == '5':
+        delete_patient()
+    elif choice == '6':
+        print("Thank you for using the Hospital Management System!")
+        break
+    else:
+        print("Invalid Choice! Try again.\n")
