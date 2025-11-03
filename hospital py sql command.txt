@@ -1,10 +1,13 @@
-CREATE DATABASE IF NOT EXISTS hospital;
+-- Step 1: Create the database
+CREATE DATABASE hospital;
 
+-- Step 2: Use the database
 USE hospital;
 
-CREATE TABLE IF NOT EXISTS patients (
+-- Step 3: Create the patient table
+CREATE TABLE patient (
+    pid INT PRIMARY KEY,
     name VARCHAR(50),
     age INT,
-    gender VARCHAR(10),
-    disease VARCHAR(100)
+    disease VARCHAR(50)
 );
