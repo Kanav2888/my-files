@@ -16,8 +16,7 @@ def add_patient():
     age = int(input("Enter Age: "))
     disease = input("Enter Disease: ")
 
-    cur.execute("INSERT INTO patient (pid, name, age, disease) VALUES (%s, %s, %s, %s)",
-                (pid, name, age, disease))
+    cur.execute("INSERT INTO patient (pid, pname, age, disease) VALUES (%s, %s, %s, %s)", (pid, name, age, disease))
     con.commit()
     print(f"Patient Added Successfully! (Patient ID: {pid})\n")
 
